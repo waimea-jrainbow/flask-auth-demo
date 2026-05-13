@@ -31,17 +31,17 @@ def show_welcome():
 #-----------------------------------------------------------
 # Creature list page - Show all the creatures
 #-----------------------------------------------------------
-@app.get("/creatures")
-def show_all_creatures():
+@app.get("/users")
+def show_all_users():
     with connect_db() as db:
         sql = """
-            SELECT id, species, name
-            FROM creatures
+            SELECT id, forename, surname, username
+            FROM users
         """
         params = ()
-        creatures = db.execute(sql, params).fetchall()
+        users = db.execute(sql, params).fetchall()
 
-        return render_template("pages/creature_list.jinja", creatures=creatures)
+        return render_template("pages/creature_list.jinja", users=users)
 
 
 #-----------------------------------------------------------
@@ -56,6 +56,47 @@ def show_help():
     flash("Error test message", "error")
 
     return render_template("pages/help.jinja")
+
+
+#-----------------------------------------------------------
+# Signup page
+#-----------------------------------------------------------
+@app.get("/user/new")
+def show_signup_form():
+    return render_template("pages/user_form.jinja")
+
+#-----------------------------------------------------------
+# Handle user signup
+#-----------------------------------------------------------
+@app.post("/user")
+def process_new_user():
+    forename = request.form.get('forename','').strip()
+    surname = request.form.get('surname','').strip()
+    username = request.form.get('username','').strip()
+    password = request.form.get('password','').strip()
+    
+    with connect_db() as db:
+        sql = "SELECT id FROM users WHERE username=?"
+        param = (username,)
+        user = db.execute(sql,param).fetchone()
+
+        if user:
+            flash(f"Username '{username}' already exists", "error")
+
+            return redirect("/user/new")
+
+        pass_hash = generate_password_hash(password)
+
+        sql = """
+            INSERT INTO users (forename, surname, username, pwdHash)
+            VALUES (?, ?, ?, ?)
+            """
+
+        params= (forename, surname, username, pass_hash)
+        db.execute(sql, params)
+
+        flash("Account created. Please login", "success")
+        return redirect("/")
 
 
 #===========================================================
