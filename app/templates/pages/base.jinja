@@ -33,9 +33,17 @@
 
         <nav>
             <a href="/">Home</a>
-            <a href="/users">User List</a>
             <a href="/help">Help</a>
-            <a href="/user/new">Sign up</a>
+            
+
+            {% if session.logged_in %}
+                <li>Welcome, {% forename %}!</li>
+                <li><a href="/admin">Admin</a></li>
+                <li><a href="/logout">Logout</a></li>
+            {% else %}
+                <a href="/user/new">Sign up</a>
+                <a href="/user/login">Sign in</a>
+            {% endif %}
         </nav>
     </header>
 
