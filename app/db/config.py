@@ -48,8 +48,8 @@ class MessageTable:
         )
     """
 
-    SEED_DATA = """
-
+    SEED_DATA = """INSERT INTO messages (user_id, title, body )
+VALUES (1, "Test message", "This is a test message.")
     """
 
 
@@ -70,7 +70,7 @@ class MessageTable:
 #----------------------------------------------------------------------------
 
 TABLES = [
-    UserTable,
+    UserTable, MessageTable
     # Add more tables here...
 ]
 

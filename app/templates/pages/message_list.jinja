@@ -1,0 +1,31 @@
+{#=====================================================
+  Creature List page
+=====================================================#}
+
+{% extends 'pages/base.jinja' %}
+
+
+{% block content %}
+
+    <h2>Message board</h2>
+
+    <section id="board_messages">
+
+        {% for message in board_messages %}
+
+            <div class="board_message">
+                <h3>{{ message.title }}</h3>
+                <h6>posted by {{ message.username }}</h6>
+                <p>{{ message.body }}</p>
+            </div>
+
+        {% else %}
+
+            <p>No Messages!</p>
+
+        {% endfor %}
+
+    </section>
+
+{% endblock %}
+

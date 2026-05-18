@@ -137,6 +137,62 @@ def logout_admin():
     flash(f"You have been logged out", "success")
     return redirect("/")
 
+#-----------------------------------------------------------
+# Message board page - Show all the messages
+#-----------------------------------------------------------
+@app.get("/messages")
+def show_all_messages():
+    with connect_db() as db:
+        sql = """
+            SELECT messages.id, user_id, title, body, users.username
+            FROM messages
+            JOIN users ON messages.user_id = users.id;
+        """
+        params = ()
+        messages = db.execute(sql, params).fetchall()
+
+        return render_template("pages/message_list.jinja", board_messages=messages)
+
+
+#===========================================================
+# Serve login page
+#===========================================================
+
+@app.get("/message/new_message")
+@login_required
+def show_message_form():
+    return render_template("pages/message_form.jinja")
+
+#===========================================================
+# Post message route
+#===========================================================
+@app.post("/message/post_message")
+@login_required
+def post_message():
+    title = request.form.get('title', '').strip()
+    body = request.form.get('body', '').strip()
+    user = session.user_id
+
+    with connect_db() as db:
+        
+        if not user:
+            flash(f"You need to be logged in to post.", "error")
+            return redirect("/login")
+
+        else:
+        
+            sql = """
+            INSERT INTO messages (user_id, title, body)
+            VALUES (?, ?, ?, ?)
+            """
+
+        params= (user, title, body)
+        db.execute(sql, params)
+
+        
+        return redirect("/")
+
+
 #===========================================================
 # Configure the app
 #===========================================================

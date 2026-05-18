@@ -33,17 +33,16 @@
 
         <nav>
             <a href="/">Home</a>
-            <a href="/help">Help</a>
-            
-
+            <a href="/messages">Messages</a>
             {% if session.logged_in %}
-                <li>Welcome, {% forename %}!</li>
-                <li><a href="/admin">Admin</a></li>
+                <li> Welcome, {{ session['user']['forename'] }}!</li>
+                <li><a href="/message/new_message">New message</a></li>
                 <li><a href="/logout">Logout</a></li>
             {% else %}
                 <a href="/user/new">Sign up</a>
                 <a href="/user/login">Sign in</a>
             {% endif %}
+                <a href="/help">Help</a>
         </nav>
     </header>
 

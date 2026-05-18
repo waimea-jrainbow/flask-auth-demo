@@ -84,7 +84,7 @@ main > h2 {
 
 /* Creature List --------------------------------------------------*/
 
-#creatures {
+#board_messages {
     display: grid;
     gap: 2rem;
     grid-template-columns: 1fr;
@@ -97,7 +97,7 @@ main > h2 {
         grid-template-columns: 1fr 1fr 1fr;
     }
 
-    .creature {
+    .board_message {
         padding: 1rem;
 
         background-color: var(--back-col-dark);
