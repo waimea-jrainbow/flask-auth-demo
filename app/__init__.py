@@ -81,7 +81,7 @@ def process_new_user():
         db.execute(sql, params)
 
         flash("Account created. Please login", "success")
-        return redirect("/")
+        return redirect("/user/login")
 
 
 
@@ -123,6 +123,7 @@ def login_user():
             "username": username,
             "forename": user["forename"],
             "surname":  user["surname"],
+            "id":       user["id"]
         }
 
         flash("Login successful", "success")
@@ -171,11 +172,11 @@ def show_message_form():
 def post_message():
     title = request.form.get('title', '').strip()
     body = request.form.get('body', '').strip()
-    user = session.user_id
+    user_id = session["user"]["id"]
 
     with connect_db() as db:
         
-        if not user:
+        if not user_id:
             flash(f"You need to be logged in to post.", "error")
             return redirect("/login")
 
@@ -183,15 +184,61 @@ def post_message():
         
             sql = """
             INSERT INTO messages (user_id, title, body)
-            VALUES (?, ?, ?, ?)
+            VALUES (?, ?, ?)
             """
 
-        params= (user, title, body)
+        params= (user_id, title, body)
         db.execute(sql, params)
 
         
         return redirect("/")
 
+
+
+
+#===========================================================
+# Show edit message
+#===========================================================
+@app.post("/message/<int:id>/edit_message")
+@login_required
+def edit_message():
+
+    with connect_db() as db:
+        
+        sql = """
+            SELECT id, title, body, user_id
+            FROM messages
+            WHERE id=?
+        """
+        params = (id,)
+        message = db.execute(sql, params).fetchone()
+
+        
+        return render_template("pages/message_form_edit.jinja", message=message)
+
+
+# Process updated message --------------------------------------
+@app.post("/message/<int:id>/edit")
+def update_a_message(id):
+    title = request.form.get('title', '').strip()
+    body = request.form.get('body', '').strip()
+
+    pinned = bool(request.form.get('pin'))
+
+    title = html.escape(title)
+    body = html.escape(body)
+
+    with connect_db() as db:
+        sql = """
+            UPDATE note
+            SET title=?, body=?, pinned=?
+            WHERE id=?
+        """
+        params = (title, body, pinned, id)
+        db.execute(sql, params)
+
+        flash("Note updated", "success")
+        return redirect("/")
 
 #===========================================================
 # Configure the app

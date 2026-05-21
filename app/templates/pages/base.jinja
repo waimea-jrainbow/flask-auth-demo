@@ -35,7 +35,7 @@
             <a href="/">Home</a>
             <a href="/messages">Messages</a>
             {% if session.logged_in %}
-                <li> Welcome, {{ session['user']['forename'] }}!</li>
+                <li> Welcome, {{ session['user']['username'] }}!</li>
                 <li><a href="/message/new_message">New message</a></li>
                 <li><a href="/logout">Logout</a></li>
             {% else %}

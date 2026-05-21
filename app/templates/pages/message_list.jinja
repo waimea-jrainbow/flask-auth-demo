@@ -17,6 +17,10 @@
                 <h3>{{ message.title }}</h3>
                 <h6>posted by {{ message.username }}</h6>
                 <p>{{ message.body }}</p>
+                {% if message.user_id == session["user"]["id"] %}
+                    <span><a href="/message/<int:id>/edit_message">🖊️ Edit</a></span>
+                    <span><a href="/note/{{ note.id }}/delete" onclick="return confirm('Really delete?')">🗑 Delete</a></span>
+                {% endif %}
             </div>
 
         {% else %}
