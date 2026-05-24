@@ -20,39 +20,23 @@ app = Flask(__name__)
 # App Routes Handlers
 #===========================================================
 
-#-----------------------------------------------------------
+#===========================================================
 # Welcome page
-#-----------------------------------------------------------
+#===========================================================
 @app.get("/")
 def show_welcome():
     return render_template("pages/welcome.jinja")
 
-
-
-#-----------------------------------------------------------
-# Help page - Show some help
-#-----------------------------------------------------------
-@app.get("/help")
-def show_help():
-
-    flash("Flash test message")
-    flash("Flash test message with a longer bit of text")
-    flash("Success test message", "success")
-    flash("Error test message", "error")
-
-    return render_template("pages/help.jinja")
-
-
-#-----------------------------------------------------------
+#===========================================================
 # Signup page
-#-----------------------------------------------------------
+#===========================================================
 @app.get("/user/new")
 def show_signup_form():
     return render_template("pages/user_form.jinja")
 
-#-----------------------------------------------------------
+#===========================================================
 # Handle user signup
-#-----------------------------------------------------------
+#===========================================================
 @app.post("/user")
 def process_new_user():
     forename = request.form.get('forename','').strip()
@@ -138,9 +122,9 @@ def logout_admin():
     flash(f"You have been logged out", "success")
     return redirect("/")
 
-#-----------------------------------------------------------
+#===========================================================
 # Message board page - Show all the messages
-#-----------------------------------------------------------
+#===========================================================
 @app.get("/messages")
 def show_all_messages():
     with connect_db() as db:
@@ -191,7 +175,7 @@ def post_message():
         db.execute(sql, params)
 
         
-        return redirect("/")
+        return redirect("/messages")
 
 
 
@@ -199,10 +183,9 @@ def post_message():
 #===========================================================
 # Show edit message
 #===========================================================
-@app.post("/message/<int:id>/edit_message")
+@app.get("/message/<int:id>/edit_message")
 @login_required
-def edit_message():
-
+def edit_message(id):
     with connect_db() as db:
         
         sql = """
@@ -216,9 +199,11 @@ def edit_message():
         
         return render_template("pages/message_form_edit.jinja", message=message)
 
-
-# Process updated message --------------------------------------
+#===========================================================
+# Process updated message 
+#===========================================================
 @app.post("/message/<int:id>/edit")
+@login_required
 def update_a_message(id):
     title = request.form.get('title', '').strip()
     body = request.form.get('body', '').strip()
@@ -230,15 +215,33 @@ def update_a_message(id):
 
     with connect_db() as db:
         sql = """
-            UPDATE note
-            SET title=?, body=?, pinned=?
+            UPDATE messages
+            SET title=?, body=?
             WHERE id=?
         """
-        params = (title, body, pinned, id)
+        params = (title, body, id)
         db.execute(sql, params)
 
-        flash("Note updated", "success")
-        return redirect("/")
+        flash("Message updated", "success")
+        return redirect("/messages")
+
+#===========================================================
+# Delete a note 
+#===========================================================
+@app.get("/message/<int:id>/delete")
+@login_required
+def delete_a_message(id):
+    with connect_db() as db:
+        sql = """
+            DELETE FROM messages
+            WHERE id=?
+        """
+        params = (id,)
+        db.execute(sql, params)
+
+        flash("Message deleted", "success")
+        return redirect("/messages")
+
 
 #===========================================================
 # Configure the app
