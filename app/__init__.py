@@ -87,7 +87,7 @@ def login_user():
 
     with connect_db() as db:
         sql = """
-            SELECT id, forename, surname, pwdHash
+            SELECT id, forename, surname, pwdHash, isAdmin
             FROM users
             WHERE username=?
         """
@@ -107,7 +107,8 @@ def login_user():
             "username": username,
             "forename": user["forename"],
             "surname":  user["surname"],
-            "id":       user["id"]
+            "id":       user["id"],
+            "isAdmin":  bool(user["isAdmin"])
         }
 
         flash("Login successful", "success")

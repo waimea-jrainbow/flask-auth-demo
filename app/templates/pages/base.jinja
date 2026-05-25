@@ -29,7 +29,7 @@
             <img src="/static/images/icon.svg" alt="Creature Icon" class="logo">
         </a>
 
-        <h1>Creatures</h1>
+        <h1>Messages</h1>
 
         <nav>
             <a href="/">Home</a>
@@ -42,6 +42,11 @@
                 <a href="/user/new">Sign up</a>
                 <a href="/user/login">Sign in</a>
             {% endif %}
+
+            {% if session.get("user") and session["user"]["isAdmin"] %}
+                <li> Admin </li>
+            {% endif %}
+
         </nav>
     </header>
 

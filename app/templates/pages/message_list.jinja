@@ -14,12 +14,12 @@
         {% for message in board_messages %}
 
             <div class="board_message">
-                <h3>{{ message.title }}</h3>
-                <h6>posted by {{ message.username }}</h6>
-                <p>{{ message.body }}</p>
-                {% if session.get("user") and message.user_id == session["user"]["id"] %}
-                    <span><a href="/message/{{ message.id }}/edit_message">🖊️ Edit</a></span>
-                    <span><a href="/message/{{ message.id }}/delete" onclick="return confirm('Really delete?')">🗑 Delete</a></span>
+                <h3 class="message_title">{{ message.title }}</h3>
+                <h6 class="message_author">posted by {{ message.username }}</h6>
+                <p class="message_body">{{ message.body }}</p>
+                {% if session.get("user") and (message.user_id == session["user"]["id"] or session["user"]["isAdmin"] == 1) %}
+                    <span><button class="button" href="/message/{{ message.id }}/edit_message">🖊️ Edit</button></span>
+                    <span><button class="button" href="/message/{{ message.id }}/delete" onclick="return confirm('Really delete?')">🗑 Delete</button></span>
                 {% endif %}
 
             </div>
