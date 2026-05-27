@@ -129,15 +129,28 @@ def logout_admin():
 @app.get("/messages")
 def show_all_messages():
     with connect_db() as db:
-        sql = """
-            SELECT messages.id, user_id, title, body, users.username
+        messages = db.execute("""
+            SELECT messages.id, messages.user_id, messages.title, messages.body, users.username
             FROM messages
-            JOIN users ON messages.user_id = users.id;
-        """
-        params = ()
-        messages = db.execute(sql, params).fetchall()
+            JOIN users ON messages.user_id = users.id
+        """).fetchall()
 
-        return render_template("pages/message_list.jinja", board_messages=messages)
+        replies = db.execute("""
+            SELECT replies.*, users.username
+            FROM replies
+            JOIN users ON replies.user_id = users.id
+        """).fetchall()
+
+    replies_by_message = {}
+    for reply in replies:
+        mID = reply["message_id"]
+        if mID not in replies_by_message:
+            replies_by_message[mID] = []
+        replies_by_message[mID].append(reply)
+
+    return render_template("pages/message_list.jinja", 
+                           board_messages=messages, 
+                           replies_by_message=replies_by_message)
 
 
 #===========================================================
@@ -227,21 +240,22 @@ def update_a_message(id):
         return redirect("/messages")
 
 #===========================================================
-# Delete a note 
+# Delete a message
 #===========================================================
 @app.get("/message/<int:id>/delete")
 @login_required
 def delete_a_message(id):
     with connect_db() as db:
-        sql = """
+        db.execute("""
+            DELETE FROM replies
+            WHERE message_id = ?
+        """, (id,))
+        db.execute("""
             DELETE FROM messages
-            WHERE id=?
-        """
-        params = (id,)
-        db.execute(sql, params)
-
-        flash("Message deleted", "success")
-        return redirect("/messages")
+            WHERE id = ?
+        """, (id,))
+    flash("Message deleted", "success")
+    return redirect("/messages")
 
 
 #===========================================================

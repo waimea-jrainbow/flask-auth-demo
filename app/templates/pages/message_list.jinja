@@ -22,6 +22,21 @@
                     <span><button class="button" href="/message/{{ message.id }}/delete" onclick="return confirm('Really delete?')">🗑 Delete</button></span>
                 {% endif %}
 
+                <details>
+                    <summary>Replies</summary>
+                    {% for reply in replies_by_message.get(message.id, []) %}
+                        <div class="replies"> 
+                            <h6 class="reply_author">posted by {{ reply.username }}</h6>
+                            <p class="reply_body">{{ reply.body }}</p>
+                            {# {% if session.get("user") and (reply.user_id == session["user"]["id"] or session["user"]["isAdmin"] == 1) %}
+                                <span><button class="button" href="/message/{{ message.id }}/edit_message">🖊️ Edit</button></span>
+                                <span><button class="button" href="/message/{{ message.id }}/delete" onclick="return confirm('Really delete?')">🗑 Delete</button></span>
+                            {% endif %} #}
+                        </div> 
+                    {% else %} <p>No Replies!</p>
+                    {% endfor %}
+                </details>
+
             </div>
 
         {% else %}

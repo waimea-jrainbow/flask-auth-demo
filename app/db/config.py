@@ -52,6 +52,26 @@ class MessageTable:
     SEED_DATA = """INSERT INTO messages (user_id, title, body )
 VALUES (1, "Test message", "This is a test message.")
     """
+    
+class ReplyTable:
+
+    NAME = "replies"
+
+    SCHEMA = """
+        CREATE TABLE replies (
+            id       INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id  INTEGER NOT NULL,
+            message_id INTEGER NOT NULL,
+            body     TEXT NOT NULL,
+
+            FOREIGN KEY(user_id) REFERENCES users(id)
+            FOREIGN KEY(message_id) REFERENCES messages(id)
+        )
+    """
+
+    SEED_DATA = """INSERT INTO replies (user_id, message_id , body )
+VALUES (1, 1, "This is a test reply.")
+    """
 
 
 
@@ -71,7 +91,7 @@ VALUES (1, "Test message", "This is a test message.")
 #----------------------------------------------------------------------------
 
 TABLES = [
-    UserTable, MessageTable
+    UserTable, MessageTable, ReplyTable
     # Add more tables here...
 ]
 
