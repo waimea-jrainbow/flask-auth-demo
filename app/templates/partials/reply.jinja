@@ -1,0 +1,17 @@
+{#=====================================================
+  Reply component
+=====================================================#}
+{% for reply in replies %}
+<div class="reply" id="reply-{{ reply.id }}">
+    <strong>{{ reply.username }}</strong>: {{ reply.body }}
+    {% if session.get("user") and (reply.user_id == session["user"]["id"] or session["user"]["isAdmin"] == 1) %}
+    <button hx-get="/reply/{{ reply.id }}/edit_form"
+            hx-target="#reply-{{ reply.id }}"
+            hx-swap="outerHTML">
+        🖊️ Edit
+    </button>
+    {% endif %}
+</div>
+{% else %}
+<p>No Replies!</p>
+{% endfor %}

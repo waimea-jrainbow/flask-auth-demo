@@ -151,6 +151,18 @@ def show_all_messages():
     return render_template("pages/message_list.jinja", 
                            board_messages=messages, 
                            replies_by_message=replies_by_message)
+    
+    
+@app.get("/message/<int:message_id>/replies")
+def get_replies(message_id):
+    with connect_db() as db:
+        replies = db.execute("""
+            SELECT replies.*, users.username
+            FROM replies
+            JOIN users ON replies.user_id = users.id
+            WHERE replies.message_id = ?
+        """, [message_id]).fetchall()
+    return render_template("partials/reply.jinja", replies=replies)
 
 
 #===========================================================
@@ -256,6 +268,57 @@ def delete_a_message(id):
         """, (id,))
     flash("Message deleted", "success")
     return redirect("/messages")
+
+#===========================================================
+# Post reply
+#===========================================================
+@app.post("/message/<int:id>/post_reply")
+@login_required
+def post_reply(id):
+    body = request.form.get('body', '').strip()
+    user_id = session["user"]["id"]
+    message_id = id
+    with connect_db() as db:
+        
+        if not user_id:
+            flash(f"You need to be logged in to post.", "error")
+            return redirect("/login")
+
+        else:
+        
+            sql = """
+            INSERT INTO replies (user_id, message_id, body)
+            VALUES (?, ?, ?)
+            """
+
+        params= (user_id, message_id, body)
+        db.execute(sql, params)
+
+        
+        return redirect("/messages")
+    
+
+#===========================================================
+# process reply edit
+#=========================================================== 
+@app.post("/message/<int:id>/edit_reply")
+@login_required
+def update_a_reply(id):
+    body = request.form.get('body', '').strip()
+
+    body = html.escape(body)
+
+    with connect_db() as db:
+        sql = """
+            UPDATE replies
+            SET body=?
+            WHERE id=?
+        """
+        params = (body, id)
+        db.execute(sql, params)
+
+        flash("Reply updated", "success")
+        return redirect("/messages")
 
 
 #===========================================================

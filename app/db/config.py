@@ -64,7 +64,7 @@ class ReplyTable:
             message_id INTEGER NOT NULL,
             body     TEXT NOT NULL,
 
-            FOREIGN KEY(user_id) REFERENCES users(id)
+            FOREIGN KEY(user_id) REFERENCES users(id),
             FOREIGN KEY(message_id) REFERENCES messages(id)
         )
     """
